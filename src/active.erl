@@ -38,7 +38,7 @@ path_event(_, [], _State) -> done.
 
 path_modified_event([P, Name|Px] = _Path, State) when P =:= "apps"; P =:= "deps" -> app_modified_event(Name, Px, State);
 path_modified_event([D|Px] = _Path, State) -> app_modified_event(toplevel_app(), [D|Px], State);
-path_modified_event(_, _State) -> dont_care.
+path_modified_event(_X, _State) -> dont_care.
 
 app_modified_event(_App, ["ebin", EName|_] = _Path, _State) -> load_ebin(EName);
 app_modified_event(_App, ["src", _EName|_] = _Path, State) -> compile(State);
@@ -48,13 +48,13 @@ app_modified_event(_App, _P, _State) -> dont_care.
 toplevel_app() -> lists:last(filename:split(filename:absname(""))).
 
 compile(#state{root=_Root} = _State) ->
-    mad:main(["compile"]).
+    put(mode,active),
+    try mad:main(["compile"]) catch E:R -> io:format("Catch: ~p:~p~n",[E,R]) end.
 
 load_ebin(EName) ->
     Tokens = string:tokens(EName, "."),
     case Tokens of
-        [Name, "beam"] ->
-            do_load_ebin(list_to_atom(Name));
+        [Name, "beam"] -> do_load_ebin(list_to_atom(Name));
         [Name, "bea#"] ->
             case monitor_handles_renames() of
                 false ->
