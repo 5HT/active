@@ -1,0 +1,7 @@
+{application, active,
+ [{description, "VXZ ACT Contignuous Compilation"},
+  {vsn, ""},
+  {registered, []},
+  {applications, [kernel,stdlib,fs]},
+  {mod, { active_app, []}},
+  {env, []}]}.
