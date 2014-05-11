@@ -29,29 +29,28 @@ handle_info(Info, State) -> {noreply, State#state{last={unk, Info}}}.
 terminate(_Reason, _State) -> ok.
 code_change(_OldVsn, State, _Extra) -> {ok, State}.
 
-path_event(C, [E|_Events], State) when E =:= created; E =:= modified; E =:= renamed ->
-    case path_filter(C) of
-        true -> path_modified_event(C, State);
-        false -> ignore end;
+path_event(C, [E|_Events], _State) when E =:= created; E =:= modified; E =:= renamed ->
+    case path_filter(C) of true -> otp(C); false -> ignore end;
 path_event(C, [_E|Events], State) -> path_event(C, Events, State);
 path_event(_, [], _State) -> done.
 
-path_modified_event([P, Name|Px] = _Path, State) when P =:= "apps"; P =:= "deps" -> app_modified_event(Name, Px, State);
-path_modified_event([D|Px] = _Path, State) -> app_modified_event(toplevel_app(), [D|Px], State);
-path_modified_event(_X, _State) -> dont_care.
+app(App,["ebin",Module|_]) -> load_ebin(App,Module);
+app(App,["priv"|_]) -> compile(App);
+app(App,["src"|_]) -> compile(App);
+app(_,_)-> ok.
 
-app_modified_event(_App, ["ebin", EName|_] = _Path, _State) -> load_ebin(EName);
-app_modified_event(_App, ["src", _EName|_] = _Path, State) -> compile(State);
-app_modified_event(_App, ["priv", _EName|_] = _Path, State) -> compile(State);
-app_modified_event(_App, _P, _State) -> dont_care.
+otp(["deps",App|Rest]) -> app(App,Rest);
+otp(["apps",App|Rest]) -> app(App,Rest);
+otp([Some|Path]) -> app(top(),[Some|Path]);
+otp(_) -> ok.
 
-toplevel_app() -> lists:last(filename:split(filename:absname(""))).
+top() -> lists:last(filename:split(filename:absname(""))).
 
-compile(#state{root=_Root} = _State) ->
+compile(_State) ->
     put(mode,active),
     try mad:main(["compile"]) catch E:R -> io:format("Catch: ~p:~p~n",[E,R]) end.
 
-load_ebin(EName) ->
+load_ebin(App,EName) ->
     Tokens = string:tokens(EName, "."),
     case Tokens of
         [Name, "beam"] -> do_load_ebin(list_to_atom(Name));

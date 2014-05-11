@@ -1,5 +1,5 @@
 {application, active,
- [{description, "VXZ ACT Contignuous Compilation"},
+ [{description, "ACT VXZ Continuous Compilation"},
   {vsn, ""},
   {registered, []},
   {applications, [kernel,stdlib,fs]},
