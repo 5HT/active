@@ -11,17 +11,21 @@ Listen Folders
 
 ### One-level
 
+```erlang
 app(App,["ebin",Module|_]) -> load_ebin(App,Module);
 app(App,["priv"|_]) -> compile(App);
 app(App,["src"|_]) -> compile(App);
 app(_,_)-> ok.
+```
 
 ### Two-level
 
+```erlang
 otp(["deps",App|Rest]) -> app(App,Rest);
 otp(["apps",App|Rest]) -> app(App,Rest);
 otp([Some|Path]) -> app(top(),[Some|Path]);
 otp(_) -> ok.
+```
 
 Usage
 -----
