@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="AСTIVE : Recompilation and Reloading on FileSystem changes" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>AСTIVE</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/synrc/active">View on GitHub</a>
+
+          <h1 id="project_title">AСTIVE</h1>
+          <h2 id="project_tagline">Recompilation and Reloading on FileSystem changes</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/synrc/active/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/synrc/active/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a name="active" class="anchor" href="#active"><span class="octicon octicon-link"></span></a>ACTIVE</h1>
+
+<p>Active is sync replacement that uses native FileSystem OS async
+listeners to compile and reload Erlang files, DTL templates and
+other files. It acts as FS subscriber under supervision and
+uses MAD under the hood.</p>
+
+<h2>
+<a name="listen-folders" class="anchor" href="#listen-folders"><span class="octicon octicon-link"></span></a>Listen Folders</h2>
+
+<h3>
+<a name="one-level" class="anchor" href="#one-level"><span class="octicon octicon-link"></span></a>One-level</h3>
+
+<div class="highlight highlight-erlang"><pre><span class="nf">app</span><span class="p">(</span><span class="nv">App</span><span class="p">,[</span><span class="s">"ebin"</span><span class="p">,</span><span class="nv">Module</span><span class="p">|_])</span> <span class="o">-&gt;</span> <span class="n">load_ebin</span><span class="p">(</span><span class="nv">App</span><span class="p">,</span><span class="nv">Module</span><span class="p">);</span>
+<span class="nf">app</span><span class="p">(</span><span class="nv">App</span><span class="p">,[</span><span class="s">"priv"</span><span class="p">|_])</span> <span class="o">-&gt;</span> <span class="n">compile</span><span class="p">(</span><span class="nv">App</span><span class="p">);</span>
+<span class="nf">app</span><span class="p">(</span><span class="nv">App</span><span class="p">,[</span><span class="s">"src"</span><span class="p">|_])</span> <span class="o">-&gt;</span> <span class="n">compile</span><span class="p">(</span><span class="nv">App</span><span class="p">);</span>
+<span class="nf">app</span><span class="p">(_,_)</span><span class="o">-&gt;</span> <span class="n">ok</span><span class="p">.</span>
+</pre></div>
+
+<h3>
+<a name="two-level" class="anchor" href="#two-level"><span class="octicon octicon-link"></span></a>Two-level</h3>
+
+<div class="highlight highlight-erlang"><pre><span class="nf">otp</span><span class="p">([</span><span class="s">"deps"</span><span class="p">,</span><span class="nv">App</span><span class="p">|</span><span class="nv">Rest</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">app</span><span class="p">(</span><span class="nv">App</span><span class="p">,</span><span class="nv">Rest</span><span class="p">);</span>
+<span class="nf">otp</span><span class="p">([</span><span class="s">"apps"</span><span class="p">,</span><span class="nv">App</span><span class="p">|</span><span class="nv">Rest</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">app</span><span class="p">(</span><span class="nv">App</span><span class="p">,</span><span class="nv">Rest</span><span class="p">);</span>
+<span class="nf">otp</span><span class="p">([</span><span class="nv">Some</span><span class="p">|</span><span class="nv">Path</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">app</span><span class="p">(</span><span class="n">top</span><span class="p">(),[</span><span class="nv">Some</span><span class="p">|</span><span class="nv">Path</span><span class="p">]);</span>
+<span class="nf">otp</span><span class="p">(_)</span> <span class="o">-&gt;</span> <span class="n">ok</span><span class="p">.</span>
+</pre></div>
+
+<h2>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<p>On Mac/Linux/Windows just include into your rebar.config:</p>
+
+<pre><code>{active, ".*", {git, "git://github.com/synrc/active", "HEAD"}}
+</code></pre>
+
+<p>NOTE: on Linux please install inotify-tools.</p>
+
+<h2>
+<a name="credits" class="anchor" href="#credits"><span class="octicon octicon-link"></span></a>Credits</h2>
+
+<ul>
+<li>Maxim Sokhatsky</li>
+<li>Vladimir Kirillov</li>
+</ul><p>OM A HUM</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">AСTIVE maintained by <a href="https://github.com/synrc">synrc</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
