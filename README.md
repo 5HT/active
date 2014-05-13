@@ -32,7 +32,7 @@ Usage
 
 On Mac/Linux/Windows just include into your rebar.config:
 
-    {active, ".*", {git, "git://github.com/synrc/active", "HEAD"}}
+    {active, ".*", {git, "git://github.com/synrc/active", {tag,"0.5"}}}
 
 NOTE: on Linux please install inotify-tools.
 
