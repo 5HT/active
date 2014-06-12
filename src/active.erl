@@ -36,6 +36,7 @@ path_event(_, [], _State) -> done.
 
 app(App,["ebin",Module|_]) -> load_ebin(App,Module);
 app(App,["priv"|_]) -> compile(App);
+app(App,["include"|_]) -> compile(App);
 app(App,["src"|_]) -> compile(App);
 app(_,_)-> ok.
 
