@@ -1,6 +1,6 @@
 {application, active,
  [{description, "ACT VXZ Continuous Compilation"},
-  {vsn, ""},
+  {vsn, "0.8"},
   {registered, []},
   {applications, [kernel,stdlib,fs]},
   {mod, { active_app, []}},
