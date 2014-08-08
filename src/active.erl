@@ -69,7 +69,7 @@ load_ebin(App,EName) ->
             end;
         %[Name, Smth] -> ok;
         _ ->
-            %error_logger:warning_msg("Active: unknown BEAM file: ~p", [EName]),
+            error_logger:warning_msg("Active: unknown BEAM file: ~p", [EName]),
             ok
     end.
 
