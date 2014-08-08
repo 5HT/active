@@ -44,7 +44,9 @@ app(App,["priv","fdlink"++_]) -> skip;
 app(App,["priv","mac"++_]) -> skip;
 app(App,["priv","windows"++_]) -> skip;
 app(App,["priv","linux"++_]) -> skip;
-app(App,["priv"|_]) -> compile(App);
+app(App,Path=["priv"|_]) -> case hd(lists:reverse(Path)) of
+    ".#" ++ _ -> skip; % mc temp files
+    Else -> compile(App) end;
 app(App,["include"|_]) -> compile(App);
 app(App,["src"|_]) -> compile(App);
 app(_,_)-> ok.
