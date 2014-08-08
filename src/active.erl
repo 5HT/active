@@ -34,16 +34,20 @@ path_event(C, [E|_Events], _State) when E =:= created; E =:= modified; E =:= ren
 path_event(C, [_E|Events], State) -> path_event(C, Events, State);
 path_event(_, [], _State) -> done.
 
-app(App,["ebin",Module|_]) -> load_ebin(App,Module);
-app(App,["priv"|_]) -> compile(App);
-app(App,["include"|_]) -> compile(App);
-app(App,["src"|_]) -> compile(App);
-app(_,_)-> ok.
-
 otp(["deps",App|Rest]) -> app(App,Rest);
 otp(["apps",App|Rest]) -> app(App,Rest);
 otp([Some|Path]) -> app(top(),[Some|Path]);
 otp(_) -> ok.
+
+app(App,["ebin",Module|_]) -> load_ebin(App,Module);
+app(App,["priv","fdlink"++_]) -> skip;
+app(App,["priv","mac"++_]) -> skip;
+app(App,["priv","windows"++_]) -> skip;
+app(App,["priv","linux"++_]) -> skip;
+app(App,["priv"|_]) -> compile(App);
+app(App,["include"|_]) -> compile(App);
+app(App,["src"|_]) -> compile(App);
+app(_,_)-> ok.
 
 top() -> lists:last(filename:split(filename:absname(""))).
 
@@ -65,7 +69,7 @@ load_ebin(App,EName) ->
             end;
         %[Name, Smth] -> ok;
         _ ->
-            error_logger:warning_msg("Active: unknown BEAM file: ~p", [EName]),
+            %error_logger:warning_msg("Active: unknown BEAM file: ~p", [EName]),
             ok
     end.
 
