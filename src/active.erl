@@ -78,7 +78,7 @@ load_ebin(App,EName) ->
 do_load_ebin(Module) ->
     {Module, Binary, Filename} = code:get_object_code(Module),
     code:load_binary(Module, Filename, Binary),
-    error_logger:info_msg("Active: module loaded: ~p~n", [Module]),
+    io:format("Active: module loaded: ~p~n\n\r", [Module]),
     reloaded.
 
 monitor_handles_renames([renamed|_]) -> true;
