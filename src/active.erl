@@ -125,8 +125,6 @@ path_filter_file("4913 (deleted)") -> false;   % vim magical file
 path_filter_file("4913")           -> false;
 path_filter_file(_)                -> true.
 
-path_filter_ext(["."|_])           -> true;    % ".file"
-path_filter_ext(".")               -> true;    % "file." | "." | ".."
 path_filter_ext(".jpg")            -> false;
 path_filter_ext(".png")            -> false;
 path_filter_ext(".gif")            -> false;
