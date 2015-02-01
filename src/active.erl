@@ -107,7 +107,10 @@ path_shorten_r([], Acc, _) -> Acc.
 % Filters
 %
 
-path_filter(L) -> not lists:any(fun(E) -> not path_filter_dir(E) end, L) andalso path_filter_last(lists:last(L)).
+path_filter(L) ->
+    not lists:any(fun(E) -> not path_filter_dir(E) end, L)
+        andalso path_filter_file(lists:last(L))
+        andalso path_filter_ext(filename:extension(L)).
 
 path_filter_dir(".git") -> false;
 path_filter_dir(".hg")  -> false;
@@ -116,8 +119,15 @@ path_filter_dir("CVS")  -> false;
 path_filter_dir("log")  -> false;
 path_filter_dir(_)      -> true.
 
-path_filter_last(".rebarinfo")     -> false;   % new rebars
-path_filter_last("LICENSE")        -> false;
-path_filter_last("4913 (deleted)") -> false;   % vim magical file
-path_filter_last("4913")           -> false;
-path_filter_last(_)                -> true.
+path_filter_file(".rebarinfo")     -> false;   % new rebars
+path_filter_file("LICENSE")        -> false;
+path_filter_file("4913 (deleted)") -> false;   % vim magical file
+path_filter_file("4913")           -> false;
+path_filter_file(_)                -> true.
+
+path_filter_ext(["."|_])           -> true;    % ".file"
+path_filter_ext(".")               -> true;    % "file." | "." | ".."
+path_filter_ext(".jpg")            -> false;
+path_filter_ext(".png")            -> false;
+path_filter_ext(".gif")            -> false;
+path_filter_ext(_)                 -> true.
