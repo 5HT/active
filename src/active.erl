@@ -39,40 +39,31 @@ otp(["apps",App|Rest]) -> app(App,Rest);
 otp([Some|Path]) -> app(top(),[Some|Path]);
 otp(_) -> ok.
 
-app(App,["ebin",Module|_]) -> load_ebin(App,Module);
-app(App,["priv","fdlink"++_]) -> skip;
-app(App,["priv","mac"++_]) -> skip;
+app(App,["ebin",Module|_])     -> load_ebin(App,Module);
+app(App,["priv","fdlink"++_])  -> skip;
+app(App,["priv","mac"++_])     -> skip;
 app(App,["priv","windows"++_]) -> skip;
-app(App,["priv","linux"++_]) -> skip;
-app(App,Path=["priv"|_]) -> case hd(lists:reverse(Path)) of
-    ".#" ++ _ -> skip; % mc temp files
-    Else -> compile(App) end;
-app(App,["include"|_]) -> compile(App);
-app(App,["src"|_]) -> compile(App);
+app(App,["priv","linux"++_])   -> skip;
+app(App,["priv"|Rest])         -> compile(App,Rest);
+app(App,["include"|Rest])      -> compile(App,Rest);
+app(App,["src"|Rest])          -> compile(App,Rest);
 app(_,_)-> ok.
 
 top() -> lists:last(filename:split(filename:absname(""))).
 
-compile(_State) ->
-    put(mode,active),
-    try mad:main(["compile"]) catch E:R -> io:format("Catch: ~p:~p~n",[E,R]) end.
+compile(App,Rest) ->
+    case lists:last(Rest) of
+         ".#" ++ _ -> skip;
+         _ -> put(mode,active),
+              try mad:main(["compile",App]) 
+            catch E:R -> io:format("Catch: ~p:~p~n",[E,R]) end end.
 
 load_ebin(App,EName) ->
     Tokens = string:tokens(EName, "."),
     case Tokens of
         [Name, "beam"] -> do_load_ebin(list_to_atom(Name));
-        [Name, "bea#"] ->
-            case monitor_handles_renames() of
-                false ->
-                    erlang:send_after(500, ?SERVER, {load_ebin, list_to_atom(Name)}),
-                    delayed;
-                true ->
-                    ignored
-            end;
-        %[Name, Smth] -> ok;
-        _ ->
-            error_logger:warning_msg("Active: unknown BEAM file: ~p", [EName]),
-            ok
+        [Name, "bea#"] -> ok;
+        _ -> error_logger:warning_msg("Active: unknown BEAM file: ~p", [EName]), ok
     end.
 
 do_load_ebin(Module) ->
@@ -110,7 +101,9 @@ path_shorten_r([], Acc, _) -> Acc.
 path_filter(L) ->
     not lists:any(fun(E) -> not path_filter_dir(E) end, L)
         andalso path_filter_file(lists:last(L))
-        andalso path_filter_ext(filename:extension(L)).
+        andalso path_filter_ext(ext(L)).
+
+ext(L) -> filename:extension(lists:last(L)).
 
 path_filter_dir(".git") -> false;
 path_filter_dir(".hg")  -> false;
@@ -125,6 +118,7 @@ path_filter_file("4913 (deleted)") -> false;   % vim magical file
 path_filter_file("4913")           -> false;
 path_filter_file(_)                -> true.
 
+path_filter_ext(".app")            -> false;
 path_filter_ext(".jpg")            -> false;
 path_filter_ext(".png")            -> false;
 path_filter_ext(".gif")            -> false;
