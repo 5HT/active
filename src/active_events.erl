@@ -64,4 +64,4 @@ code_change(_OldVsn, State, _Extra) ->
 %% Private dunctions
 subscribe(Event, MFA) ->
     ok = gen_event:add_handler(?MODULE, ?MODULE, [Event, MFA]),
-    erlang:whereis(?MODULE).
+    {ok, erlang:whereis(?MODULE)}.
