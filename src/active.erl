@@ -34,19 +34,34 @@ path_event(C, [E|_Events], _State) when E =:= created; E =:= modified; E =:= ren
 path_event(C, [_E|Events], State) -> path_event(C, Events, State);
 path_event(_, [], _State) -> done.
 
-otp(["deps",App|Rest]) -> app(App,Rest);
-otp(["apps",App|Rest]) -> app(App,Rest);
-otp([Some|Path]) -> app(top(),[Some|Path]);
+otp(["deps",App|Rest]) -> maybe_app(App,Rest);
+otp(["apps",App|Rest]) -> maybe_app(App,Rest);
+otp([Some|Path]) -> maybe_app(top(),[Some|Path]);
 otp(_) -> ok.
 
-app(App,["ebin",Module|_])     -> load_ebin(App,Module);
-app(App,["priv","fdlink"++_])  -> skip;
-app(App,["priv","mac"++_])     -> skip;
-app(App,["priv","windows"++_]) -> skip;
-app(App,["priv","linux"++_])   -> skip;
-app(App,["priv"|Rest])         -> compile(App,Rest);
-app(App,["include"|Rest])      -> compile(App,Rest);
-app(App,["src"|Rest])          -> compile(App,Rest);
+maybe_app(App, Path) ->
+    EnabledApps = application:get_env(active, apps, undefined),
+    case EnabledApps of
+        undefined ->
+            app(App, Path);
+        L when is_list(L) ->
+            AppAtom = list_to_atom(App),
+            case lists:member(AppAtom, L) of
+                true ->
+                    app(App, Path);
+                false ->
+                    skip
+            end
+    end.
+    
+app( App,["ebin",Module|_])     -> load_ebin(App,Module);
+app(_App,["priv","fdlink"++_])  -> skip;
+app(_App,["priv","mac"++_])     -> skip;
+app(_App,["priv","windows"++_]) -> skip;
+app(_App,["priv","linux"++_])   -> skip;
+app( App,["priv"|Rest])         -> compile(App,Rest);
+app( App,["include"|Rest])      -> compile(App,Rest);
+app( App,["src"|Rest])          -> compile(App,Rest);
 app(_,_)-> ok.
 
 top() -> lists:last(filename:split(filename:absname(""))).
@@ -58,7 +73,7 @@ compile(App,Rest) ->
               try mad:main(["compile",App]) 
             catch E:R -> io:format("Catch: ~p:~p~n",[E,R]) end end.
 
-load_ebin(App,EName) ->
+load_ebin(_App, EName) ->
     Tokens = string:tokens(EName, "."),
     case Tokens of
         [Name, "beam"] -> do_load_ebin(list_to_atom(Name));
