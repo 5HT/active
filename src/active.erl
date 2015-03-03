@@ -64,14 +64,24 @@ app( App,["include"|Rest])      -> compile(App,Rest);
 app( App,["src"|Rest])          -> compile(App,Rest);
 app(_,_)-> ok.
 
-top() -> lists:last(filename:split(filename:absname(""))).
+top() -> lists:last(filename:split(fs:path())).
 
 compile(App,Rest) ->
     case lists:last(Rest) of
          ".#" ++ _ -> skip;
          _ -> put(mode,active),
-              try mad:main(["compile",App]) 
-            catch E:R -> io:format("Catch: ~p:~p~n",[E,R]) end end.
+              try
+                  ConfigFile = "rebar.config",
+                  ConfigFileAbs = filename:join(fs:path(), ConfigFile),
+                  Conf          = mad_utils:consult(ConfigFileAbs),
+                  Conf1         = mad_script:script(ConfigFileAbs, Conf, ""),
+                  mad:compile(fs:path(), ConfigFile, Conf1, [App])
+              catch 
+                  E:R -> 
+                      error_logger:error_msg("~p", [erlang:get_stacktrace()]),
+                      error_logger:error_msg("Catch: ~p:~p",[E,R])
+              end 
+    end.
 
 load_ebin(_App, EName) ->
     Tokens = string:tokens(EName, "."),
@@ -87,7 +97,12 @@ load_ebin(_App, EName) ->
     end.
 
 do_load_ebin(Module) ->
-    IsLoaded = code:is_loaded(Module),
+    IsLoaded = case code:is_loaded(Module) of
+                   {file, _} ->
+                       true;
+                   false ->
+                       false
+               end,
     {Module, Binary, Filename} = code:get_object_code(Module),
     case code:load_binary(Module, Filename, Binary) of
         {module, Module} when IsLoaded->

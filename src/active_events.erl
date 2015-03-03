@@ -42,8 +42,8 @@ notify_reload(Event) ->
 init([Event, Function]) ->
     {ok, #state{event = Event, function = Function}}.
 
-handle_event({Event, Module}, State = #state{event = Event, function = MF}) ->
-    erlang:apply(MF, [[Module]]),
+handle_event({Event, Module}, State = #state{event = Event, function = {Mod, Fun}}) ->
+    erlang:apply(Mod, Fun, [[Module]]),
     {ok, State};
 handle_event(_, State) ->
     {ok, State}.
