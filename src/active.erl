@@ -76,16 +76,27 @@ compile(App,Rest) ->
 load_ebin(_App, EName) ->
     Tokens = string:tokens(EName, "."),
     case Tokens of
-        [Name, "beam"] -> do_load_ebin(list_to_atom(Name));
-        [Name, "bea#"] -> ok;
-        _ -> error_logger:warning_msg("Active: unknown BEAM file: ~p", [EName]), ok
+        [Name, "beam"] -> 
+            LoadRes = do_load_ebin(list_to_atom(Name)),
+            error_logger:info_msg("Active: module loaded: ~p~n\n\r", [LoadRes]),
+            active_events:notify_reload(LoadRes);
+        [Name, "bea#"] -> 
+            ok;
+        _ -> 
+            error_logger:warning_msg("Active: unknown BEAM file: ~p", [EName]), ok
     end.
 
 do_load_ebin(Module) ->
+    IsLoaded = code:is_loaded(Module),
     {Module, Binary, Filename} = code:get_object_code(Module),
-    code:load_binary(Module, Filename, Binary),
-    io:format("Active: module loaded: ~p~n\n\r", [Module]),
-    reloaded.
+    case code:load_binary(Module, Filename, Binary) of
+        {module, Module} when IsLoaded->
+            {reloaded, Module};
+        {module, Module} when not IsLoaded ->
+            {loaded_new, Module};
+        {error, Reason} ->
+            {load_error, Module, Reason}
+    end.
 
 monitor_handles_renames([renamed|_]) -> true;
 monitor_handles_renames([_|Events]) -> monitor_handles_renames(Events);
