@@ -80,7 +80,7 @@ load_ebin(_App, EName) ->
             LoadRes = do_load_ebin(list_to_atom(Name)),
             error_logger:info_msg("Active: module loaded: ~p~n\n\r", [LoadRes]),
             active_events:notify_reload(LoadRes);
-        [Name, "bea#"] -> 
+        [_Name, "bea#"] ->
             ok;
         _ -> 
             error_logger:warning_msg("Active: unknown BEAM file: ~p", [EName]), ok
