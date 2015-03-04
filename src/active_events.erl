@@ -11,7 +11,7 @@
 -behaviour(gen_event).
 
 %% API
--export([start_link/0, subscribe_onload/1, subscribe_onnew/1, notify_reload/1]).
+-export([start_link/0, subscribe_onload/1, subscribe_onnew/1, notify_reload/1, subscribe/2]).
 
 %% Callbacks
 -export([init/1, handle_event/2, handle_call/2, handle_info/2, terminate/2, code_change/3]).
@@ -28,6 +28,10 @@ subscribe_onload(Function) ->
 -spec subscribe_onnew(Function :: mf()) -> ok.
 subscribe_onnew(Function) ->
     subscribe(loaded_new, Function).
+
+-spec subscribe(Event :: reloaded | loaded_new, Function :: mf()) -> ok.
+subscribe(Event, Function) ->
+    ok = gen_event:add_sup_handler(?MODULE, {?MODULE, Event}, [Event, Function]).
 
 notify_reload(Event) ->
     gen_event:notify(?MODULE, Event).
@@ -62,5 +66,4 @@ code_change(_OldVsn, State, _Extra) ->
     {ok, State}.
 
 %% Private dunctions
-subscribe(Event, MFA) ->
-    ok = gen_event:add_sup_handler(?MODULE, {?MODULE, Event}, [Event, MFA]).
+
