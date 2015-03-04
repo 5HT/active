@@ -7,9 +7,15 @@
 
 start_link() -> gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
 
-init([]) -> fs:subscribe(), erlang:process_flag(priority, low), {ok, #state{last=fresh, root=fs:path()}}.
+init([]) ->
+    fs:subscribe(),
+    erlang:process_flag(priority, low),
+    gen_server:cast(self(), recompile_all),
+    {ok, #state{last=fresh, root=fs:path()}}.
 handle_call(_Request, _From, State) -> {reply, ok, State}.
-handle_cast(_Msg, State) -> {noreply, State}.
+handle_cast(recompile_all, State) ->
+    compile(top(), ["all"]),
+    {noreply, State}.
 handle_info({_Pid, {fs,file_event}, {Path, Flags}}, #state{root=Root} = State) ->
     Cur = path_shorten(filename:split(Root)),
     P = filename:split(Path),
