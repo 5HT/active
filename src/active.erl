@@ -7,9 +7,15 @@
 
 start_link() -> gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
 
-init([]) -> fs:subscribe(), erlang:process_flag(priority, low), {ok, #state{last=fresh, root=fs:path()}}.
+init([]) ->
+    fs:subscribe(),
+    erlang:process_flag(priority, low),
+    gen_server:cast(self(), recompile_all),
+    {ok, #state{last=fresh, root=fs:path()}}.
 handle_call(_Request, _From, State) -> {reply, ok, State}.
-handle_cast(_Msg, State) -> {noreply, State}.
+handle_cast(recompile_all, State) ->
+    compile(top(), ["all"]),
+    {noreply, State}.
 handle_info({_Pid, {fs,file_event}, {Path, Flags}}, #state{root=Root} = State) ->
     Cur = path_shorten(filename:split(Root)),
     P = filename:split(Path),
@@ -34,43 +40,84 @@ path_event(C, [E|_Events], _State) when E =:= created; E =:= modified; E =:= ren
 path_event(C, [_E|Events], State) -> path_event(C, Events, State);
 path_event(_, [], _State) -> done.
 
-otp(["deps",App|Rest]) -> app(App,Rest);
-otp(["apps",App|Rest]) -> app(App,Rest);
-otp([Some|Path]) -> app(top(),[Some|Path]);
+otp(["deps",App|Rest]) -> maybe_app(App,Rest);
+otp(["apps",App|Rest]) -> maybe_app(App,Rest);
+otp([Some|Path]) -> maybe_app(top(),[Some|Path]);
 otp(_) -> ok.
 
-app(App,["ebin",Module|_])     -> load_ebin(App,Module);
-app(App,["priv","fdlink"++_])  -> skip;
-app(App,["priv","mac"++_])     -> skip;
-app(App,["priv","windows"++_]) -> skip;
-app(App,["priv","linux"++_])   -> skip;
-app(App,["priv"|Rest])         -> compile(App,Rest);
-app(App,["include"|Rest])      -> compile(App,Rest);
-app(App,["src"|Rest])          -> compile(App,Rest);
+maybe_app(App, Path) ->
+    EnabledApps = application:get_env(active, apps, undefined),
+    case EnabledApps of
+        undefined ->
+            app(App, Path);
+        L when is_list(L) ->
+            AppAtom = list_to_atom(App),
+            case lists:member(AppAtom, L) of
+                true ->
+                    app(App, Path);
+                false ->
+                    skip
+            end
+    end.
+    
+app( App,["ebin",Module|_])     -> load_ebin(App,Module);
+app(_App,["priv","fdlink"++_])  -> skip;
+app(_App,["priv","mac"++_])     -> skip;
+app(_App,["priv","windows"++_]) -> skip;
+app(_App,["priv","linux"++_])   -> skip;
+app( App,["priv"|Rest])         -> compile(App,Rest);
+app( App,["include"|Rest])      -> compile(App,Rest);
+app( App,["src"|Rest])          -> compile(App,Rest);
 app(_,_)-> ok.
 
-top() -> lists:last(filename:split(filename:absname(""))).
+top() -> lists:last(filename:split(fs:path())).
 
 compile(App,Rest) ->
     case lists:last(Rest) of
          ".#" ++ _ -> skip;
          _ -> put(mode,active),
-              try mad:main(["compile",App]) 
-            catch E:R -> io:format("Catch: ~p:~p~n",[E,R]) end end.
+              try
+                  ConfigFile = "rebar.config",
+                  ConfigFileAbs = filename:join(fs:path(), ConfigFile),
+                  Conf          = mad_utils:consult(ConfigFileAbs),
+                  Conf1         = mad_script:script(ConfigFileAbs, Conf, ""),
+                  mad:compile(fs:path(), ConfigFile, Conf1, [App])
+              catch 
+                  E:R -> 
+                      error_logger:error_msg("~p", [erlang:get_stacktrace()]),
+                      error_logger:error_msg("Catch: ~p:~p",[E,R])
+              end 
+    end.
 
-load_ebin(App,EName) ->
+load_ebin(_App, EName) ->
     Tokens = string:tokens(EName, "."),
     case Tokens of
-        [Name, "beam"] -> do_load_ebin(list_to_atom(Name));
-        [Name, "bea#"] -> ok;
-        _ -> error_logger:warning_msg("Active: unknown BEAM file: ~p", [EName]), ok
+        [Name, "beam"] -> 
+            LoadRes = do_load_ebin(list_to_atom(Name)),
+            error_logger:info_msg("Active: module loaded: ~p~n\n\r", [LoadRes]),
+            active_events:notify_reload(LoadRes);
+        [_Name, "bea#"] ->
+            ok;
+        _ -> 
+            error_logger:warning_msg("Active: unknown BEAM file: ~p", [EName]), ok
     end.
 
 do_load_ebin(Module) ->
+    IsLoaded = case code:is_loaded(Module) of
+                   {file, _} ->
+                       true;
+                   false ->
+                       false
+               end,
     {Module, Binary, Filename} = code:get_object_code(Module),
-    code:load_binary(Module, Filename, Binary),
-    io:format("Active: module loaded: ~p~n\n\r", [Module]),
-    reloaded.
+    case code:load_binary(Module, Filename, Binary) of
+        {module, Module} when IsLoaded->
+            {reloaded, Module};
+        {module, Module} when not IsLoaded ->
+            {loaded_new, Module};
+        {error, Reason} ->
+            {load_error, Module, Reason}
+    end.
 
 monitor_handles_renames([renamed|_]) -> true;
 monitor_handles_renames([_|Events]) -> monitor_handles_renames(Events);
