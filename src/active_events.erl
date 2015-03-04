@@ -21,11 +21,11 @@ start_link() ->
     gen_event:start_link({local, ?MODULE}).
 
 -type mf() :: {M :: module(), F :: atom()}.
--spec subscribe_onload(Function :: mf()) -> {ok, Ref :: pid()}.
+-spec subscribe_onload(Function :: mf()) -> ok.
 subscribe_onload(Function) ->
     subscribe(reloaded, Function).
 
--spec subscribe_onnew(Function :: mf()) -> {ok, Ref :: pid()}.
+-spec subscribe_onnew(Function :: mf()) -> ok.
 subscribe_onnew(Function) ->
     subscribe(loaded_new, Function).
 
@@ -63,5 +63,4 @@ code_change(_OldVsn, State, _Extra) ->
 
 %% Private dunctions
 subscribe(Event, MFA) ->
-    ok = gen_event:add_handler(?MODULE, ?MODULE, [Event, MFA]),
-    {ok, erlang:whereis(?MODULE)}.
+    ok = gen_event:add_sup_handler(?MODULE, ?MODULE, [Event, MFA]).
