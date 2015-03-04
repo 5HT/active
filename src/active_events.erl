@@ -63,4 +63,4 @@ code_change(_OldVsn, State, _Extra) ->
 
 %% Private dunctions
 subscribe(Event, MFA) ->
-    ok = gen_event:add_sup_handler(?MODULE, ?MODULE, [Event, MFA]).
+    ok = gen_event:add_sup_handler(?MODULE, {?MODULE, Event}, [Event, MFA]).
