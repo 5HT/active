@@ -90,16 +90,13 @@ compile(App,Rest) ->
     end.
 
 load_ebin(_App, EName) ->
-    Tokens = string:tokens(EName, "."),
-    case Tokens of
-        [Name, "beam"] -> 
-            LoadRes = do_load_ebin(list_to_atom(Name)),
+    case lists:reverse(EName) of
+        "maeb." ++ Tail -> Name = lists:reverse(Tail),
+            LoadRes = do_load_ebin(list_to_atom(lists:flatten(Name))),
             error_logger:info_msg("Active: module loaded: ~p~n\n\r", [LoadRes]),
             active_events:notify_reload(LoadRes);
-        [_Name, "bea#"] ->
-            ok;
-        _ -> 
-            error_logger:warning_msg("Active: unknown BEAM file: ~p", [EName]), ok
+        "#aeb." ++ _ -> ok;
+        _ -> error_logger:warning_msg("Active: unknown BEAM file: ~p", [EName]), ok
     end.
 
 do_load_ebin(Module) ->
