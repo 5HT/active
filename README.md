@@ -1,10 +1,10 @@
 ACTIVE
 ======
 
-Active is sync replacement that uses native FileSystem OS async
+Active is a [sync][] replacement that uses native FileSystem OS async
 listeners to compile and reload Erlang files, DTL templates and
 other files. It acts as FS subscriber under supervision and
-uses MAD under the hood.
+uses [MAD][] under the hood.
 
 Listen Folders
 --------------
@@ -43,3 +43,6 @@ Credits
 * Vladimir Kirillov
 
 OM A HUM
+
+[sync]: https://github.com/rustyio/sync
+[MAD]: https://github.com/synrc/mad
