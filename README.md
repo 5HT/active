@@ -1,10 +1,11 @@
 ACTIVE
 ======
 
-Active is a [sync][] replacement that uses native FileSystem OS async
-listeners to compile and reload Erlang files, DTL templates and
-other files. It acts as FS subscriber under supervision and
-uses [MAD][] under the hood.
+Active is a [sync](https://github.com/rustyio/sync) replacement
+that uses native file-system OS async listeners to compile and
+reload Erlang files, DTL templates and other files. It acts as
+FS subscriber under supervision and uses
+[mad](https://github.com/synrc/mad) under the hood.
 
 Listen Folders
 --------------
@@ -43,6 +44,3 @@ Credits
 * Vladimir Kirillov
 
 OM A HUM
-
-[sync]: https://github.com/rustyio/sync
-[MAD]: https://github.com/synrc/mad
