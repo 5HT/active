@@ -36,9 +36,14 @@ terminate(_Reason, _State) -> ok.
 code_change(_OldVsn, State, _Extra) -> {ok, State}.
 
 path_event(C, [E|_Events], _State) when E =:= created; E =:= modified; E =:= renamed ->
-    case path_filter(C) of true -> otp(C); false -> ignore end;
+    case path_filter(C) of true -> maybe_otp(C); false -> ignore end;
 path_event(C, [_E|Events], State) -> path_event(C, Events, State);
 path_event(_, [], _State) -> done.
+
+maybe_otp(C) ->
+    case application:get_env(active, handler) of
+         {ok,{M,F}} -> M:F(C);
+                  _ -> otp(C) end.
 
 otp(["deps",App|Rest]) -> maybe_app(App,Rest);
 otp(["apps",App|Rest]) -> maybe_app(App,Rest);
@@ -50,7 +55,7 @@ maybe_app(App, Path) ->
     case EnabledApps of
         undefined ->
             app(App, Path);
-        L when is_list(L) ->
+        {ok,L} when is_list(L) ->
             AppAtom = list_to_atom(App),
             case lists:member(AppAtom, L) of
                 true ->
