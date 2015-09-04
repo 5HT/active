@@ -23,7 +23,7 @@ handle_info({_Pid, {fs,file_event}, {Path, Flags}}, #state{root=Root} = State) -
     Result = case lists:prefix(Cur, P) of
         true ->
             Components = P -- Cur,
-            %error_logger:info_msg("event: ~p ~p", [Components, Flags]),
+            %mad:info("event: ~p ~p", [Components, Flags]),
             path_event(Components, Flags, State);
         false ->
             ok
@@ -89,8 +89,8 @@ compile(App,Rest) ->
                   mad:compile(fs:path(), ConfigFile, Conf1, [App])
               catch 
                   E:R -> 
-                      error_logger:error_msg("~p", [erlang:get_stacktrace()]),
-                      error_logger:error_msg("Catch: ~p:~p",[E,R])
+                      mad:info("~p", [erlang:get_stacktrace()]),
+                      mad:info("Catch: ~p:~p",[E,R])
               end 
     end.
 
@@ -98,10 +98,10 @@ load_ebin(_App, EName) ->
     case lists:reverse(EName) of
         "maeb." ++ Tail -> Name = lists:reverse(Tail),
             LoadRes = do_load_ebin(list_to_atom(lists:flatten(Name))),
-            error_logger:info_msg("Active: module loaded: ~p~n\n\r", [LoadRes]),
+            mad:info("Active: module loaded: ~p~n\n\r", [LoadRes]),
             active_events:notify_reload(LoadRes);
         "#aeb." ++ _ -> ok;
-        _ -> error_logger:warning_msg("Active: unknown BEAM file: ~p", [EName]), ok
+        _ -> mad:info("Active: unknown BEAM file: ~p", [EName]), ok
     end.
 
 do_load_ebin(Module) ->
