@@ -70,6 +70,7 @@ app(_App,["priv","fdlink"++_])  -> skip;
 app(_App,["priv","mac"++_])     -> skip;
 app(_App,["priv","windows"++_]) -> skip;
 app(_App,["priv","linux"++_])   -> skip;
+app(_App,["priv","static"++_])  -> skip;
 app( App,["priv"|Rest])         -> compile(App,Rest);
 app( App,["include"|Rest])      -> compile(App,Rest);
 app( App,["src"|Rest])          -> compile(App,Rest);
