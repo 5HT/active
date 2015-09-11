@@ -81,7 +81,6 @@ app(_,_)-> ok.
 top() -> lists:last(filename:split(fs:path())).
 
 compile(App,Rest) ->
-    mad:info("Compilke App ~p Rest ~p~n",[App,Rest]),
     case lists:last(Rest) of
          ".#" ++ _ -> skip;
          _ -> put(mode,active),
