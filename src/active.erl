@@ -66,7 +66,7 @@ maybe_app(App, Path) ->
                     skip
             end
     end.
-    
+
 app( App,["ebin",Module|_])     -> load_ebin(App,Module);
 app(_App,["priv","fdlink"++_])  -> skip;
 app(_App,["priv","mac"++_])     -> skip;
@@ -83,20 +83,18 @@ top() -> lists:last(filename:split(fs:path())).
 compile(App,Rest) ->
     case lists:last(Rest) of
          ".#" ++ _ -> skip;
-         _ -> put(mode,active),
-              try
+         _ -> try
                   ConfigFile = "rebar.config",
                   ConfigFileAbs = filename:join(fs:path(), ConfigFile),
                   Conf          = mad_utils:consult(ConfigFileAbs),
                   Conf1         = mad_script:script(ConfigFileAbs, Conf, ""),
                   put(App,updated),
-                  mad:compile(fs:path(), ConfigFile, Conf1, [App]),
-                  ok
-              catch 
-                  E:R -> 
+                  mad:compile(fs:path(), ConfigFile, Conf1, [App])
+              catch
+                  E:R ->
                       mad:info("~p", [erlang:get_stacktrace()]),
                       mad:info("Catch: ~p:~p",[E,R])
-              end 
+              end
     end.
 
 load_ebin(_App, EName) ->
