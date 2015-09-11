@@ -54,11 +54,13 @@ maybe_app(App, Path) ->
     EnabledApps = application:get_env(active, apps, undefined),
     case EnabledApps of
         undefined ->
+%            mad:info("App ~p Path ~p~n",[App,Path]),
             app(App, Path);
         {ok,L} when is_list(L) ->
             AppAtom = list_to_atom(App),
             case lists:member(AppAtom, L) of
                 true ->
+%                    mad:info("App ~p Path ~p~n",[App,Path]),
                     app(App, Path);
                 false ->
                     skip
@@ -70,7 +72,7 @@ app(_App,["priv","fdlink"++_])  -> skip;
 app(_App,["priv","mac"++_])     -> skip;
 app(_App,["priv","windows"++_]) -> skip;
 app(_App,["priv","linux"++_])   -> skip;
-app(_App,["priv","static"++_])  -> skip;
+app(_App,["priv","static"|_])   -> skip;
 app( App,["priv"|Rest])         -> compile(App,Rest);
 app( App,["include"|Rest])      -> compile(App,Rest);
 app( App,["src"|Rest])          -> compile(App,Rest);
@@ -79,6 +81,7 @@ app(_,_)-> ok.
 top() -> lists:last(filename:split(fs:path())).
 
 compile(App,Rest) ->
+    mad:info("Compilke App ~p Rest ~p~n",[App,Rest]),
     case lists:last(Rest) of
          ".#" ++ _ -> skip;
          _ -> put(mode,active),
@@ -87,7 +90,9 @@ compile(App,Rest) ->
                   ConfigFileAbs = filename:join(fs:path(), ConfigFile),
                   Conf          = mad_utils:consult(ConfigFileAbs),
                   Conf1         = mad_script:script(ConfigFileAbs, Conf, ""),
-                  mad:compile(fs:path(), ConfigFile, Conf1, [App])
+                  put(App,updated),
+                  mad:compile(fs:path(), ConfigFile, Conf1, [App]),
+                  ok
               catch 
                   E:R -> 
                       mad:info("~p", [erlang:get_stacktrace()]),
