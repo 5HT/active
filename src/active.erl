@@ -83,19 +83,11 @@ top() -> lists:last(filename:split(fs:path())).
 compile(App,Rest) ->
     case lists:last(Rest) of
          ".#" ++ _ -> skip;
-         _ -> try
-                  ConfigFile = "rebar.config",
-                  ConfigFileAbs = filename:join(fs:path(), ConfigFile),
-                  Conf          = mad_utils:consult(ConfigFileAbs),
-                  Conf1         = mad_script:script(ConfigFileAbs, Conf, ""),
-                  put(App,updated),
-                  mad:compile(fs:path(), ConfigFile, Conf1, [App])
-              catch
-                  E:R ->
+             _ -> try put(App,updated),
+                      mad:compile(App)
+                catch E:R ->
                       mad:info("~p", [erlang:get_stacktrace()]),
-                      mad:info("Catch: ~p:~p",[E,R])
-              end
-    end.
+                      mad:info("Catch: ~p:~p",[E,R]) end end.
 
 load_ebin(_App, EName) ->
     case lists:reverse(EName) of
