@@ -84,7 +84,7 @@ compile(App,Rest) ->
     case lists:last(Rest) of
          ".#" ++ _ -> skip;
              _ -> try put(App,updated),
-                      (mad:profile()):compile(App)
+                      mad_compile:compile(App)
                 catch E:R ->
                       mad:info("~p", [erlang:get_stacktrace()]),
                       mad:info("Catch: ~p:~p",[E,R]) end end.
