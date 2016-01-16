@@ -80,6 +80,7 @@ app(_,_)-> ok.
 
 top() -> lists:last(filename:split(fs:path())).
 
+compile(_App, []) -> ok;
 compile(App,Rest) ->
     case lists:last(Rest) of
          ".#" ++ _ -> skip;
