@@ -72,13 +72,15 @@ app(_App,["priv","fdlink"++_])  -> skip;
 app(_App,["priv","mac"++_])     -> skip;
 app(_App,["priv","windows"++_]) -> skip;
 app(_App,["priv","linux"++_])   -> skip;
-app(_App,["priv","static"|_Rest])   -> case application:get_env(active,compile_on_static,false) of
-                                            false -> skip;
-                                            _ -> compile(_App,_Rest) end;
-app( App,["priv"|Rest])         -> compile(App,Rest);
+app(_App,["priv","static"|_Rest])   -> compile_skip(compile_on_static,_App,_Rest);
+app( App,["priv"|Rest])             -> compile_skip(compile_on_priv,App,Rest);
 app( App,["include"|Rest])      -> compile(App,Rest);
 app( App,["src"|Rest])          -> compile(App,Rest);
 app(_,_)-> ok.
+
+compile_skip(Key,App,Rest) -> case application:get_env(active,Key,false) of
+                                            false -> skip;
+                                            _ -> compile(App,Rest) end.
 
 top() -> lists:last(filename:split(fs:path())).
 
