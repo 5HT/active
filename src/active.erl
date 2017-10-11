@@ -159,6 +159,7 @@ path_filter_dir(".hg")  -> false;
 path_filter_dir(".svn") -> false;
 path_filter_dir("CVS")  -> false;
 path_filter_dir("log")  -> false;
+path_filter_dir("node_modules")  -> false;
 path_filter_dir(_)      -> true.
 
 path_filter_file(".rebarinfo")     -> false;   % new rebars
