@@ -84,8 +84,13 @@ compile_skip(Key,App,Rest) -> case application:get_env(active,Key,false) of
 
 top() -> lists:last(filename:split(fs:path())).
 
+on_compile(App, Rest) -> ok.
+
 compile(_App, []) -> ok;
 compile(App,Rest) ->
+    case application:get_env(active,on_compile,{?MODULE,on_compile}) of
+         {MOD,FUN} -> MOD:FUN(App,Rest);
+         _ -> ok end,
     case lists:last(Rest) of
          ".#" ++ _ -> skip;
              _ -> try put(App,updated),
