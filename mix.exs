@@ -3,7 +3,7 @@ defmodule Active.Mixfile do
 
   def project do
     [app: :active,
-     version: "1.9.0",
+     version: "4.10.0",
      description: "Erlang active reloader",
      package: package,
      deps: deps]

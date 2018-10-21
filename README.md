@@ -1,6 +1,8 @@
 ACTIVE
 ======
 
+[![Build Status](https://travis-ci.org/synrc/active.svg?branch=master)](https://travis-ci.org/synrc/active)
+
 Active is a [sync](https://github.com/rustyio/sync) replacement
 that uses native file-system OS async listeners to compile and
 reload Erlang files, DTL templates and other files. It acts as
