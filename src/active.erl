@@ -84,7 +84,7 @@ compile_skip(Key,App,Rest) -> case application:get_env(active,Key,false) of
 
 top() -> lists:last(filename:split(fs:path())).
 
-on_compile(App, Rest) -> ok.
+on_compile(_App, _Rest) -> ok.
 
 compile(_App, []) -> ok;
 compile(App,Rest) ->
