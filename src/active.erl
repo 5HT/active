@@ -1,36 +1,32 @@
 -module(active).
 -behaviour(gen_server).
 -define(SERVER, ?MODULE).
--compile(export_all).
--export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
+-export([on_compile/2, init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 -record(state, {last, root}).
-
-start_link() -> gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
 
 init([]) ->
     fs:subscribe(),
     erlang:process_flag(priority, low),
     gen_server:cast(self(), recompile_all),
     {ok, #state{last=fresh, root=fs:path()}}.
+
 handle_call(_Request, _From, State) -> {reply, ok, State}.
-handle_cast(recompile_all, State) ->
-    compile(top(), ["all"]),
-    {noreply, State}.
+handle_cast(recompile_all, State) -> compile(top(), ["all"]), {noreply, State}.
 handle_info({_Pid, {fs,file_event}, {Path, Flags}}, #state{root=Root} = State) ->
+
     Cur = path_shorten(filename:split(Root)),
     P = filename:split(Path),
-
     Result = case lists:prefix(Cur, P) of
-        true ->
-            Components = P -- Cur,
-            %mad:info("event: ~p ~p", [Components, Flags]),
-            path_event(Components, Flags, State);
-        false ->
-            ok
+        true -> path_event(P -- Cur, Flags, State);
+        false -> ok
     end,
 
     {noreply, State#state{last={event, Path, Flags, Result}}};
-handle_info({load_ebin, Atom}, State) -> do_load_ebin(Atom), {noreply, State#state{last={do_load_ebin, Atom}}};
+
+handle_info({load_ebin, Atom}, State) ->
+    do_load_ebin(Atom),
+    {noreply, State#state{last={do_load_ebin, Atom}}};
+
 handle_info(Info, State) -> {noreply, State#state{last={unk, Info}}}.
 terminate(_Reason, _State) -> ok.
 code_change(_OldVsn, State, _Extra) -> {ok, State}.
@@ -53,17 +49,12 @@ otp(_) -> ok.
 maybe_app(App, Path) ->
     EnabledApps = application:get_env(active, apps, undefined),
     case EnabledApps of
-        undefined ->
-%            mad:info("App ~p Path ~p~n",[App,Path]),
-            app(App, Path);
+        undefined -> app(App, Path);
         {ok,L} when is_list(L) ->
             AppAtom = list_to_atom(App),
             case lists:member(AppAtom, L) of
-                true ->
-%                    mad:info("App ~p Path ~p~n",[App,Path]),
-                    app(App, Path);
-                false ->
-                    skip
+                true -> app(App, Path);
+                false -> skip
             end
     end.
 
@@ -126,19 +117,6 @@ do_load_ebin(Module) ->
             {load_error, Module, Reason}
     end.
 
-monitor_handles_renames([renamed|_]) -> true;
-monitor_handles_renames([_|Events]) -> monitor_handles_renames(Events);
-monitor_handles_renames([]) -> false.
-
-monitor_handles_renames() ->
-    case get(monitor_handles_renames) of
-        undefined ->
-            R = monitor_handles_renames(fs:known_events()),
-            put(monitor_handles_renames, R),
-            R;
-        V -> V
-    end.
-
 % ["a", "b", ".."] -> ["a"]
 path_shorten(Coms) -> path_shorten_r(lists:reverse(Coms), [], 0).
 
@@ -147,10 +125,6 @@ path_shorten_r(["."|Rest], Acc, Count) -> path_shorten_r(Rest, Acc, Count);
 path_shorten_r([_C|Rest], Acc, Count) when Count > 0 -> path_shorten_r(Rest, Acc, Count - 1);
 path_shorten_r([C|Rest], Acc, 0) -> path_shorten_r(Rest, [C|Acc], 0);
 path_shorten_r([], Acc, _) -> Acc.
-
-%
-% Filters
-%
 
 path_filter(L) ->
     not lists:any(fun(E) -> not path_filter_dir(E) end, L)
