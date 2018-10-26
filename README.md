@@ -1,5 +1,5 @@
-ACTIVE
-======
+ACTIVE: Continuous Compilation
+==============================
 
 [![Build Status](https://travis-ci.org/synrc/active.svg?branch=master)](https://travis-ci.org/synrc/active)
 
