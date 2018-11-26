@@ -1,6 +1,6 @@
 {application, active,
  [{description, "ACT Filesystem Activities"},
-  {vsn, "4.11"},
+  {vsn, "4.12"},
   {registered, []},
   {applications, [kernel,stdlib,fs]},
   {mod, { active_app, []}},
