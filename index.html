@@ -22,9 +22,11 @@
             <section>
                 <h3>SYNOPSIS</h3>
                 <div>ACTIVE is a recompilation logic for Erlang application built on top of
-                     the native file system listener <a href="https://fs.n2o.space">FS</a>.</div>
+                     the native file system listener <a href="https://fs.n2o.space">FS</a>.
+                     On Mac/Linux/Windows just include into your rebar.config:</div>
             <figure><code>
- git clone git://github.com/synrc/active
+ {active,".*",{git,"git://github.com/synrc/active",
+              {tag,"1.9"}}}
             </code></figure>
             <br>
             <div>
@@ -36,6 +38,21 @@
     <main>
     <section>
         <a name=intro><h3>INTRO</h3></a>
+     <h4>One-level</h4>
+        <figure><code>
+ app(App,["ebin",Module|_]) -> load_ebin(App,Module);
+ app(App,["priv"|_]) -> compile(App);
+ app(App,["src"|_]) -> compile(App);
+ app(_,_)-> ok.
+        </code></figure>
+     <h4>Two-level</h4>
+        <figure><code>
+ otp(["deps",App|Rest]) -> app(App,Rest);
+ otp(["apps",App|Rest]) -> app(App,Rest);
+ otp([Some|Path]) -> app(top(),[Some|Path]);
+ otp(_) -> ok.
+        </code></figure>
+
     </section>
     <section>
         <a name=plugin><h3>CONTRIBUTORS</h3></a>
