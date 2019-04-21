@@ -1,6 +1,10 @@
 -module(active_app).
 -behaviour(application).
--export([start/2, stop/1]).
+-behaviour(supervisor).
+-export([start/2, stop/1, init/1]).
+-define(CHILD(I, Type, Args), {I, {I, start_link, Args}, permanent, 5000, Type, [I]}).
 
-start(_StartType, _StartArgs) -> active_sup:start_link().
 stop(_State) -> ok.
+start(_StartType, _StartArgs) -> supervisor:start_link({local, ?MODULE}, ?MODULE, []).
+init([]) -> {ok, { {one_for_one, 5, 10}, [ ?CHILD(active, worker, []),
+                                           ?CHILD(active_events, worker, []) ]}}.
