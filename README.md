@@ -2,6 +2,7 @@ ACTIVE: Continuous Compilation
 ==============================
 
 [![Build Status](https://travis-ci.org/synrc/active.svg?branch=master)](https://travis-ci.org/synrc/active)
+[![Hex pm](http://img.shields.io/hexpm/v/active.svg?style=flat)](https://hex.pm/packages/active)
 
 Active is a [sync](https://github.com/rustyio/sync) replacement
 that uses native file-system OS async listeners to compile and
