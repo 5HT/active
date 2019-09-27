@@ -11,6 +11,13 @@
     <a href="https://n2o.dev">DEV</a>
     <a href="https://active.n2o.space">ACTIVE</a>
     <a href="#" style="background:#ededed;">EVENTS</a>
+  <div class="dropdown">
+    <a onclick="drop()" class="dropbtn">EN</a>
+    <div id="dropdown" class="dropdown-content">
+      <a href="https://n2o.dev/deps/active/man/ua/active_events.htm">UA</a>
+      <a href="https://active.n2o.space/man/active_events.htm">EN</a>
+    </div>
+  </div>
 </nav><header>
     <a href="../index.html"><img src="https://n2o.space/img/Synrc Neo.svg" /></a>
     <h1>EVENTS</h1>
@@ -28,4 +35,6 @@ MAN_MODULES
     </section>
 </main><footer>
     2005—2019 © Synrc Research Center
-</footer></body></html>
+</footer>
+<script>function drop(){document.getElementById("dropdown").classList.toggle("show");}</script>
+</body></html>

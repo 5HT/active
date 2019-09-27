@@ -11,6 +11,13 @@
 </head><body><nav>
         <a href="https://n2o.dev">DEV</a>
         <a href="https://active.n2o.space" style="background:#ededed;">ACTIVE</a>
+  <div class="dropdown">
+    <a onclick="drop()" class="dropbtn">EN</a>
+    <div id="dropdown" class="dropdown-content">
+      <a href="https://n2o.dev/deps/active/man/ua/index.html">UA</a>
+      <a href="https://active.n2o.space/">EN</a>
+    </div>
+  </div>
     </nav><header>
         <a href="https://github.com/synrc/active"><img src="https://synrc.space/images/Synrc Neo.svg?v=1" /></a>
         <h1>ACTIVE</h1>
@@ -57,4 +64,6 @@
     </section>
 </main><footer>
     Made with <span class="heart">❤</span> to N2O
-</footer></body></html>
+</footer>
+<script>function drop(){document.getElementById("dropdown").classList.toggle("show");}</script>
+</body></html>
