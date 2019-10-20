@@ -1,6 +1,6 @@
 {application, active,
- [{description, "ACT Filesystem Activities"},
-  {vsn, "5.5"},
+ [{description, "ACTIVE Runtime Auto-recompilation"},
+  {vsn, "5.10.1"},
   {registered, []},
   {applications, [kernel,stdlib,fs]},
   {mod, { active_app, []}},

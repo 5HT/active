@@ -1,5 +1,5 @@
 -module(active_events).
--include("active.hrl").
+-include_lib("active/include/active.hrl").
 -behaviour(gen_event).
 -export([start_link/0, subscribe_onload/1, subscribe_onnew/1, notify_reload/1, subscribe/2]).
 -export([init/1, handle_event/2, handle_call/2, handle_info/2, terminate/2, code_change/3]).
