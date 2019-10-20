@@ -8,7 +8,8 @@ Active is a [sync](https://github.com/rustyio/sync) replacement
 that uses native file-system OS async listeners to compile and
 reload Erlang files, DTL templates and other files. It acts as
 FS subscriber under supervision and uses
-[mad](https://github.com/synrc/mad) under the hood.
+[mad](https://github.com/synrc/mad),
+`IEx.Helpers.c` or you can add your own compiler, like `rebar3` or `make`.
 
 Listen Folders
 --------------
@@ -45,5 +46,6 @@ Credits
 
 * Maxim Sokhatsky
 * Vladimir Kirillov
+* Oleksandr Palchikovsky (Elixir)
 
 OM A HUM
