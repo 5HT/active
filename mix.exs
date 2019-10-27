@@ -3,8 +3,8 @@ defmodule ACTIVE.Mixfile do
 
   def project do
     [app: :active,
-     version: "5.10.2",
-     description: "ACTIVE Runtime Auto-recompilation",
+     version: "5.10.3",
+     description: "ACTIVE Continuous Compilation",
      deps: deps(),
      package: package()]
   end
@@ -14,7 +14,7 @@ defmodule ACTIVE.Mixfile do
      files: ["include", "lib", "src", "LICENSE", "README.md", "rebar.config", "mix.exs"],
      maintainers: ["Vladimir Kirillov", "Namdak Tonpa"],
      licenses: ["MIT"],
-     links: %{"GitHub" => "https://github.com/synrc/fs"}]
+     links: %{"GitHub" => "https://github.com/synrc/active"}]
    end
 
   def application do

@@ -1,6 +1,6 @@
 {application, active,
- [{description, "ACTIVE Runtime Auto-recompilation"},
-  {vsn, "5.10.2"},
+ [{description, "ACTIVE Continuous Compilation"},
+  {vsn, "5.10.3"},
   {registered, []},
   {applications, [kernel,stdlib,fs]},
   {mod, { active_app, []}},
