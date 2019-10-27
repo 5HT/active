@@ -60,9 +60,9 @@ otp([Some|Rest],Path) -> maybe_app(top(),[Some|Rest],Path);
 otp(_,_) -> ok.
 
 maybe_app(App, SplitPath, Path) ->
-    EnabledApps = application:get_env(active, apps, undefined),
+    EnabledApps = application:get_env(active, apps, []),
     case EnabledApps of
-        undefined -> app(App, SplitPath, Path);
+        [] -> app(App, SplitPath, Path);
         {ok,L} when is_list(L) ->
             AppAtom = list_to_atom(App),
             case lists:member(AppAtom, L) of
@@ -96,7 +96,7 @@ compile(App,Rest,Path) ->
     case lists:last(Rest) of
          ".#" ++ _ -> skip;
              _ -> try put(App,updated),
-                      {M,F} = application:get_env(active,compile,{mad,compile}),
+                      {M,F} = application:get_env(active,compile,{mad_compile,compile}),
                       M:F(App,Path)
                 catch E:R ->
                       io:format("~p", [erlang:get_stacktrace()]),

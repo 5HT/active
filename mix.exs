@@ -3,11 +3,10 @@ defmodule ACTIVE.Mixfile do
 
   def project do
     [app: :active,
-     version: "5.10.1",
+     version: "5.10.2",
      description: "ACTIVE Runtime Auto-recompilation",
-     deps: deps,
-     docs: [],
-     package: package]
+     deps: deps(),
+     package: package()]
   end
 
   defp package do
