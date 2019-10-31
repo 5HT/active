@@ -2,7 +2,7 @@ ACTIVE: Continuous Compilation
 ==============================
 
 [![Actions Status](https://github.com/synrc/active/workflows/mix/badge.svg)](https://github.com/synrc/active/actions)
-[![Build Status](https://travis-ci.org/synrc/active.svg?branch=master)](https://travis-ci.org/synrc/active)
+[![Build Status](https://travis-ci.com/synrc/active.svg?branch=master)](https://travis-ci.com/synrc/active)
 [![Hex pm](http://img.shields.io/hexpm/v/active.svg?style=flat)](https://hex.pm/packages/active)
 
 Active is a [sync](https://github.com/rustyio/sync) replacement
