@@ -1,6 +1,6 @@
 {application, active,
  [{description, "ACTIVE Continuous Compilation"},
-  {vsn, "5.10.3"},
+  {vsn, "5.10.4"},
   {registered, []},
   {applications, [kernel,stdlib,fs]},
   {mod, { active_app, []}},
