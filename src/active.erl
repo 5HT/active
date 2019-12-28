@@ -149,7 +149,6 @@ path_filter_dir(".git")            -> false;
 path_filter_dir(".hg")             -> false;
 path_filter_dir(".svn")            -> false;
 path_filter_dir("CVS")             -> false;
-path_filter_dir("ebin")            -> false;
 path_filter_dir("build")           -> false;
 path_filter_dir("_build")          -> false;
 path_filter_dir("log")             -> false;
