@@ -3,7 +3,7 @@ defmodule ACTIVE.Mixfile do
 
   def project do
     [app: :active,
-     version: "5.12.0",
+     version: "6.1.1",
      description: "ACTIVE Continuous Compilation",
      deps: deps(),
      package: package()]
@@ -23,6 +23,6 @@ defmodule ACTIVE.Mixfile do
 
   defp deps do
      [{:ex_doc, "~> 0.11", only: :dev},
-      {:fs, "~> 4.10.1"}]
+      {:fs, "~> 6.1.1"}]
   end
 end
