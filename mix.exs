@@ -3,7 +3,7 @@ defmodule ACTIVE.Mixfile do
 
   def project do
     [app: :active,
-     version: "6.1.1",
+     version: "7.11.0",
      description: "ACTIVE Continuous Compilation",
      deps: deps(),
      package: package()]
