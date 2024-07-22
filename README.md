@@ -38,7 +38,7 @@ Usage
 
 On Mac/Linux/Windows just include into your rebar.config:
 
-    {active, ".*", {git, "git://github.com/synrc/active", {tag,"1.9"}}}
+    {active, ".*", {git, "https://github.com/synrc/active.git", {tag,"1.9"}}}
 
 NOTE: on Linux please install inotify-tools.
 
